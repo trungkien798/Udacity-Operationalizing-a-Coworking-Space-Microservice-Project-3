@@ -8,7 +8,7 @@ from sqlalchemy import and_, text
 from random import randint
 
 from config import app, db
-
+from models import Token, User
 
 port_number = int(os.environ.get("APP_PORT", 5153))
 
@@ -21,11 +21,8 @@ def health_check():
 @app.route("/readiness_check")
 def readiness_check():
     try:
-        check_db = db.session.execute(text("""
-        SELECT Count(tokens.id) 
-        FROM tokens
-        LIMIT 1
-        """))
+        countToken = db.session.query(Token).count()
+        countUser = db.session.query(User).count()
     except Exception as e:
         app.logger.error(e)
         return "failed", 500
